@@ -15,6 +15,7 @@ import { KeyboardArrowDown, Logout, Person } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import { APP_NAME, ROUTES } from '../../../constants/index.ts'
 import { clearSession } from '../../../utils/authSession.ts'
+import { authApi } from '../../../api/authApi.ts'
 import { useCurrentUser } from '../../../features/auth/useCurrentUser.ts'
 
 export function TopBar() {
@@ -26,10 +27,17 @@ export function TopBar() {
   const openMenu = (event: MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget)
   const closeMenu = () => setAnchorEl(null)
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     closeMenu()
-    clearSession()
-    navigate(ROUTES.login, { replace: true })
+    try {
+      await authApi.logout()
+    } catch {
+      // Ignore server failure; local logout still proceeds below.
+    } finally {
+      // Always drop the local session so a failed request can't leave the user stuck logged in.
+      clearSession()
+      navigate(ROUTES.login, { replace: true })
+    }
   }
 
   return (

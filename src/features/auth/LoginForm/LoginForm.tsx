@@ -19,7 +19,7 @@ import {
   Visibility,
   VisibilityOff,
 } from '@mui/icons-material'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 import { authApi } from '../../../api/authApi.ts'
 import { toApiError } from '../../../api/ApiError.ts'
 import { ROUTES } from '../../../constants/index.ts'
@@ -29,6 +29,10 @@ import styles from './LoginForm.module.css'
 
 export function LoginForm() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const locationState = location.state as { successMessage?: unknown } | null
+  const successMessage =
+    typeof locationState?.successMessage === 'string' ? locationState.successMessage : null
   const [showPassword, setShowPassword] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -47,11 +51,11 @@ export function LoginForm() {
   const submitHandler = handleSubmit(async (values) => {
     setSubmitError(null)
     try {
-      const result = await authApi.login({
+      await authApi.login({
         username: values.email,
         password: values.password,
       })
-      saveSession(result.access_token)
+      saveSession()
       navigate(ROUTES.home)
     } catch (error) {
       setSubmitError(toApiError(error).message)
@@ -67,6 +71,11 @@ export function LoginForm() {
         Please enter your details to sign in.
       </Typography>
 
+      {successMessage && !submitError && (
+        <Alert severity="success" className={styles.alert}>
+          {successMessage}
+        </Alert>
+      )}
       {submitError && (
         <Alert severity="error" className={styles.alert}>
           {submitError}
@@ -163,7 +172,12 @@ export function LoginForm() {
         />
 
         <Box className={styles.forgotRow}>
-          <MuiLink href="#" underline="hover" variant="body2">
+          <MuiLink
+            component={RouterLink}
+            to={ROUTES.forgotPassword}
+            underline="hover"
+            variant="body2"
+          >
             Forgot password?
           </MuiLink>
         </Box>

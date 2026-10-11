@@ -1,13 +1,17 @@
-const TOKEN_KEY = 'token'
+// The JWT lives in an HttpOnly cookie; this flag is only a UI hint for route guards.
+const SESSION_KEY = 'isAuthenticated'
+const LEGACY_TOKEN_KEY = 'token'
 
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY)
+export function isAuthenticated(): boolean {
+  return localStorage.getItem(SESSION_KEY) === 'true'
 }
 
-export function saveSession(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token)
+export function saveSession(): void {
+  localStorage.setItem(SESSION_KEY, 'true')
+  localStorage.removeItem(LEGACY_TOKEN_KEY)
 }
 
 export function clearSession(): void {
-  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(SESSION_KEY)
+  localStorage.removeItem(LEGACY_TOKEN_KEY)
 }

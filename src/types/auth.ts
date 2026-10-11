@@ -19,8 +19,31 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   status: string
-  access_token: string
-  token_type: string
+  message: string
+}
+
+export interface LogoutResponse {
+  status: string
+  message: string
+}
+
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+export interface ForgotPasswordResponse {
+  status: string
+  message: string
+}
+
+export interface ResetPasswordRequest {
+  password: string
+  token: string
+}
+
+export interface ResetPasswordResponse {
+  status: string
+  message: string
 }
 
 export interface CurrentUser {
